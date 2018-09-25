@@ -7,14 +7,17 @@
 
 #include <inttypes.h>
 #include <avr/io.h>
+#include <SPI.h>
+#include <SD.h>
 
 
 class Talkie
 {
 	public:
-		void say(uint8_t* address);
+		void say(char* filename);
 		uint8_t* ptrAddr;
 		uint8_t ptrBit;
+		File wordFile;
 	private:
 		// Setup
 		uint8_t setup;
@@ -23,6 +26,7 @@ class Talkie
 		void setPtr(uint8_t* addr);
 		uint8_t rev(uint8_t a);
 		uint8_t getBits(uint8_t bits);
+		byte getByte(int pos);
 };
 
 

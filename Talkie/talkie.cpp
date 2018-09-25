@@ -35,6 +35,11 @@ void Talkie::setPtr(uint8_t* addr) {
 	ptrBit = 0;
 }
 
+byte Talkie::getByte(int pos) {
+	wordFile.seek(pos);
+	return wordFile.read();
+}
+
 // The ROMs used with the TI speech were serial, not byte wide.
 // Here's a handy routine to flip ROM data which is usually reversed.
 uint8_t Talkie::rev(uint8_t a) {
@@ -50,9 +55,11 @@ uint8_t Talkie::rev(uint8_t a) {
 uint8_t Talkie::getBits(uint8_t bits) {
 	uint8_t value;
 	uint16_t data;
-	data = rev(pgm_read_byte(ptrAddr))<<8;
+	//data = rev(pgm_read_byte(ptrAddr))<<8;
+	data = rev(getByte(ptrAddr))<<8;
 	if (ptrBit+bits > 8) {
-		data |= rev(pgm_read_byte(ptrAddr+1));
+		//data |= rev(pgm_read_byte(ptrAddr+1));
+		data |= rev(getByte(ptrAddr+1));
 	}
 	data <<= ptrBit;
 	value = data >> (16-bits);
@@ -63,7 +70,7 @@ uint8_t Talkie::getBits(uint8_t bits) {
 	}
 	return value;
 }
-void Talkie::say(uint8_t* addr) {
+void Talkie::say(char* filename) {
 	uint8_t energy;
 
 	if (!setup) {
@@ -71,6 +78,10 @@ void Talkie::say(uint8_t* addr) {
 		// 
 		// Enable the speech system whenever say() is called.
 		
+		if (!SD.begin(10)) {
+			while (1);
+		}
+
 		pinMode(3,OUTPUT);
 		// Timer 2 set up as a 62500Hz PWM.
 		//
@@ -94,7 +105,10 @@ void Talkie::say(uint8_t* addr) {
 		setup = 1;
 	}
 
-	setPtr(addr);
+	if (!SD.exists(filename)) return;
+	
+	wordFile = SD.open(filename, FILE_READ);
+	setPtr(0);
 	do {
 		uint8_t repeat;
 
@@ -141,6 +155,7 @@ void Talkie::say(uint8_t* addr) {
 		}
 		delay(25);
 	} while (energy != 0xf);
+	wordFile.close();
 }
 
 #define CHIRP_SIZE 41
