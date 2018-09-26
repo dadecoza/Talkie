@@ -15,12 +15,14 @@ class Talkie
 {
 	public:
 		void say(char* filename);
+		uint8_t exists(char* filename);
 		uint8_t* ptrAddr;
 		uint8_t ptrBit;
 		File wordFile;
 	private:
 		// Setup
 		uint8_t setup;
+		uint8_t sdSetup;
 		
 		// Bitstream parser
 		void setPtr(uint8_t* addr);

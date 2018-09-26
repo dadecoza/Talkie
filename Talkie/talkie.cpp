@@ -70,6 +70,17 @@ uint8_t Talkie::getBits(uint8_t bits) {
 	}
 	return value;
 }
+
+uint8_t Talkie::exists(char* filename) {
+	if (!sdSetup) {
+		if (!SD.begin(10)) {
+			while (1);
+		}
+		sdSetup = 1;
+	}
+	return SD.exists(filename);
+}
+
 void Talkie::say(char* filename) {
 	uint8_t energy;
 
@@ -77,10 +88,6 @@ void Talkie::say(char* filename) {
 		// Auto-setup.
 		// 
 		// Enable the speech system whenever say() is called.
-		
-		if (!SD.begin(10)) {
-			while (1);
-		}
 
 		pinMode(3,OUTPUT);
 		// Timer 2 set up as a 62500Hz PWM.
@@ -103,6 +110,13 @@ void Talkie::say(char* filename) {
 		TIMSK1 = _BV(OCIE1A);
 
 		setup = 1;
+	}
+
+	if (!sdSetup) {
+		if (!SD.begin(10)) {
+			while (1);
+		}
+		sdSetup = 1;
 	}
 
 	if (!SD.exists(filename)) return;
