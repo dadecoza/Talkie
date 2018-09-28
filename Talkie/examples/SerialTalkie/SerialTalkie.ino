@@ -14,20 +14,24 @@ void setup() {
   voice.say("/VOCAB/TI99/READY.BIN");
 }
 
-void talk(char* word) {
+void talk(char* text) {
+  char shortname[9];
+  memset(shortname, '\0', sizeof(shortname));
+  strncpy(shortname, text, sizeof(shortname)-1);
+  
   char filename[50];
   memset(filename, '\0', sizeof(filename));
   strcpy(filename, vocab);
-  strcat(filename, word);
+  strcat(filename, shortname);
   strcat(filename, ".BIN");
   if (voice.exists(filename)) {
     voice.say(filename);
   } else {
-    for (int i=0; word[i] != '\0'; i++) {
+    for (int i=0; text[i] != '\0'; i++) {
       memset(filename, '\0', sizeof(filename));
       strcpy(filename, vocab);
       char tmp[] = {'A', '\0'};
-      tmp[0]= word[i];
+      tmp[0]= text[i];
       strcat(filename, tmp);
       strcat(filename, ".BIN");
       voice.say(filename);
